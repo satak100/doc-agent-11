@@ -1,0 +1,75 @@
+PRITY — USE THIS TO CREATE YOUR REAL A2 TRANSCRIPT
+
+Project ID: 11
+Project: Pharmacological Query from Prescription
+Name: Jannatul Ferdous Prity
+Student ID: 2105113
+Sections led: Sections 1, 5, 6, 7 and 8
+
+Data statement to retain:
+The prescription data was obtained with proper permission from Somatec Pharmaceuticals Ltd. and supplied through the proper organizational/project channel for academic research. Raw clinical pages remain restricted and will not be redistributed without authorization.
+
+STEP 1 — START A NEW AI CHAT
+
+Attach or make available these project files if the AI cannot inspect the repository directly:
+- forms/A2_form.docx
+- configs/task.yaml
+- configs/design_choices.md
+- reports/eval_report.md
+- reports/privacy_audit.md
+- reports/pipeline_diagram.md
+- artifacts/pii_holdout_metrics.json
+- artifacts/index_e5/index_stats.json
+- notebooks/kb_demo.ipynb
+
+STEP 2 — PASTE THIS AS YOUR FIRST PROMPT
+
+I am Jannatul Ferdous Prity (2105113), a member of Project 11, “Pharmacological Query from Prescription.” Our two-member team is building an ingest → layout → OCR → chunking → embedding → vector-index pipeline for permissioned handwritten medical prescriptions. I led A2 Sections 1, 5, 6, 7 and 8. Teach me the project carefully, but do not simply agree with me or write unsupported claims. Inspect the evidence I provide, ask me questions, challenge inconsistencies, and require measured results for every conclusion. Help me understand the implementation well enough to defend it in a viva. Do not expose patient identifiers.
+
+Start by explaining:
+1. What A2 requires and how each requirement maps to our repository artifacts.
+2. Why handwriting, mixed Bangla/English text, repeated prescription templates, shadows and page layout make this corpus difficult.
+3. The complete pipeline and the contract between Page, Region and Chunk.
+4. Why PaddleOCR-VL 1.6 is a reproduced/adapted pretrained method but is not fine-tuning.
+5. How CER, WER and medication-entity F1 differ, using our 12-page/61-medication evaluation.
+6. Why the crop+trim OCR result can improve CER/F1 while remaining unsafe for clinical use.
+7. Why 64-word chunks with 16-word overlap were selected over 128/24 and 256/32.
+8. Why multilingual E5-small, lexical feature hashing and reciprocal-rank fusion complement one another.
+9. How to verify the real “Phoscon 210mg” retrieval example and the failed whole-page OCR example.
+10. Why privacy is our primary NFR, while index build time is only an operational metric.
+11. Interpret the manual privacy pilot: 12 pages, 12 patient-name entities, one explicit redaction, two indexed leaks and nine OCR omissions. Explain why explicit recall is 0.0833, conditional recall is 0.3333 and non-disclosure is 0.8333.
+12. Explain why a regex scan reporting zero unresolved matches did not prove privacy recall.
+13. Identify contradictions or weak claims in our form, notebook, reports and configs.
+14. Decide whether fine-tuning is strictly required by the course guide, what A1 promised, and what honest experiment would be needed.
+15. End with at least ten viva questions. Ask me to answer them one by one, correct weak answers, and make me explain the design in my own words.
+
+STEP 3 — CONTINUE THE REAL CONVERSATION
+
+Do not paste all questions at once and stop. Ask follow-ups in your own words. Useful follow-ups include:
+- Show me the exact evidence supporting that number.
+- Is OCR omission a successful redaction? Why or why not?
+- What would make the retrieval evaluation misleading?
+- Why was classical enhancement rejected?
+- Why not use HNSW or IVF for only 943 chunks?
+- What claim would be unsafe in a medication-search system?
+- What would you change if you had verified line-level training labels?
+- Which result surprised you most, and why?
+
+STEP 4 — EXPORT WITHOUT REWRITING
+
+Save the complete chronological conversation as:
+
+transcripts/2105113.txt
+
+It must contain, in order:
+1. Header: name, student ID, project, sections led, AI system and date.
+2. Full conversation: every real prompt and every real AI reply, unedited. Remove passwords/API keys if any appear.
+3. Personal reflection written by Prity:
+   - what I initially misunderstood;
+   - where I challenged or corrected the AI;
+   - what measured evidence changed my decision;
+   - what I personally verified;
+   - what limitation remains;
+   - how the conversation affected Sections 1, 5, 6, 7 and 8.
+
+Do not submit this instruction file itself as the transcript. Submit the exported real conversation.

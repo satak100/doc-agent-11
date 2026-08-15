@@ -1,0 +1,187 @@
+{
+  "scope": "medicine-name/strength lines only",
+  "pages": 12,
+  "reference_medications": 61,
+  "cer": 0.6066024759284732,
+  "wer": 0.7888198757763976,
+  "entity_precision": 0.6129032258064516,
+  "entity_recall": 0.3114754098360656,
+  "entity_f1": 0.41304347826086957,
+  "true_positive": 19,
+  "false_positive": 12,
+  "false_negative": 42,
+  "examples": [
+    {
+      "relative_path": "Screenshot_20260815-073922_Somatec.jpg",
+      "reference": [
+        "multical k2 7",
+        "phoscon 210 mg",
+        "esoral mups 20 mg",
+        "divanor 10 mg",
+        "n bion",
+        "asmont 10 mg"
+      ],
+      "prediction": [
+        "multical k2 7",
+        "phoscon 210mg",
+        "esoreal mups 20mg",
+        "divanore 10mg",
+        "n bion",
+        "asmont 10mg"
+      ]
+    },
+    {
+      "relative_path": "Screenshot_20260815-063516_Somatec.jpg",
+      "reference": [
+        "fixcef plus 500 mg",
+        "dextac 30 mg",
+        "viset 50 mg",
+        "coralmet d",
+        "atoz"
+      ],
+      "prediction": []
+    },
+    {
+      "relative_path": "Screenshot_20260805-112207_Somatec.jpg",
+      "reference": [
+        "kindical dx",
+        "natfol 5 mg",
+        "x lan 20 mg",
+        "n bion",
+        "zecfol cl",
+        "viset 50 mg"
+      ],
+      "prediction": [
+        "kindical 8x",
+        "natfol smy",
+        "x lan 20mg",
+        "n bion",
+        "2nd 201"
+      ]
+    },
+    {
+      "relative_path": "Screenshot_20260815-061742_Somatec__1SOQr-5t.jpg",
+      "reference": [
+        "cefurox 250 mg",
+        "asmont 10 mg",
+        "fenadin 180 mg",
+        "maxpro mups 20 mg",
+        "napa extend"
+      ],
+      "prediction": [
+        "cefa abu 200 7 qru r",
+        "asmont 10 7 ০০০০০",
+        "fenadin 180 7 ০০০০০",
+        "napa gennnd 7 g80 গ রহণ র"
+      ]
+    },
+    {
+      "relative_path": "Screenshot_20260815-064059_Somatec.jpg",
+      "reference": [
+        "cefurim cv 250 mg",
+        "flustar 500 mg",
+        "rolac 10 mg",
+        "sergel 20 mg",
+        "coralmet d"
+      ],
+      "prediction": [
+        "ralac 10",
+        "conalnet d"
+      ]
+    },
+    {
+      "relative_path": "Screenshot_20260805-115847_Somatec.jpg",
+      "reference": [
+        "nexium mups 20 mg",
+        "coralmet d",
+        "d gest 10 mg",
+        "acf 500 mg",
+        "folic ci"
+      ],
+      "prediction": [
+        "cosmic d"
+      ]
+    },
+    {
+      "relative_path": "Screenshot_20260805-113434_Somatec.jpg",
+      "reference": [
+        "tonax 10 mg",
+        "coralmet d",
+        "rabe 20 mg",
+        "miovit"
+      ],
+      "prediction": [
+        "tonax 10",
+        "coralmet d",
+        "rabe 20",
+        "miovit"
+      ]
+    },
+    {
+      "relative_path": "Screenshot_20260815-073110_Somatec.jpg",
+      "reference": [
+        "napa rapid",
+        "asmont",
+        "fastel 120 mg",
+        "napa 500 mg"
+      ],
+      "prediction": []
+    },
+    {
+      "relative_path": "Screenshot_20260815-080438_Somatec.jpg",
+      "reference": [
+        "phoscon 210 mg",
+        "coralmet d",
+        "esoral mups 20 mg",
+        "neurobest",
+        "algin 50 mg",
+        "arokast 10 mg"
+      ],
+      "prediction": [
+        "phoscon 210 m",
+        "coralmet",
+        "esoral mups 2023",
+        "newtobest"
+      ]
+    },
+    {
+      "relative_path": "Screenshot_20260815-073336_Somatec.jpg",
+      "reference": [
+        "kindical dx",
+        "n bion",
+        "x lan 30 mg",
+        "stopri 50 mg",
+        "napdas 500 mg"
+      ],
+      "prediction": [
+        "kindical",
+        "n bion",
+        "x lan 30mg",
+        "stopri some",
+        "napdas 500mg"
+      ]
+    },
+    {
+      "relative_path": "Screenshot_20260805-113952_Somatec.jpg",
+      "reference": [
+        "moxaclav",
+        "remora",
+        "trosma",
+        "m lucas",
+        "napa 250 mg"
+      ],
+      "prediction": []
+    },
+    {
+      "relative_path": "Screenshot_20260805-105239_Somatec.jpg",
+      "reference": [
+        "phoscon 210 mg",
+        "ovocal dx",
+        "miovit",
+        "exium mups 20 mg",
+        "rupadim 10 mg"
+      ],
+      "prediction": []
+    }
+  ]
+}

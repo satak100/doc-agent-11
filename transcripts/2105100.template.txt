@@ -1,0 +1,57 @@
+DRAFT TEMPLATE — NOT A SUBMISSION TRANSCRIPT
+Replace the bracketed areas with Satak's actual, full, unedited AI conversation. Do not submit this template as evidence.
+
+HEADER
+Project ID: 11
+Project: Pharmacological Query from Prescription
+Student: Satak Kumar Dey
+Student ID: 2105100
+Team size: 2
+Sections led: 2, 3, 4 and 8
+Data authorization: The prescription data was obtained with proper permission from Somatec Pharmaceuticals Ltd. and supplied through the proper organizational/project channel for academic use. Raw clinical data remains restricted.
+AI system used: [system and model]
+Conversation date(s): [YYYY-MM-DD]
+Conversation link/export reference, if available: [reference]
+
+FULL UNEDITED CONVERSATION
+[Paste the complete chronological export here, including your prompts, the AI's answers, errors, corrections, commands, and unsuccessful attempts. Do not rewrite the exchange after the fact.]
+
+To produce useful genuine evidence, conduct a real session that covers these questions in your own words:
+1. Explain the assignment requirements back to me and identify which artifacts are required for A2.
+2. Inspect the prescription samples and explain the handwriting, layout, code-switching, image-quality, and privacy difficulties.
+3. Compare conventional OCR, TrOCR, PaddleOCR-VL, and another published/pretrained OCR method. Which is a fair baseline and why?
+4. Help me define a page-level train/validation/heldout split that prevents leakage from duplicate templates or near-duplicate images.
+5. Explain CER, WER, medication-entity precision/recall/F1, retrieval recall@k, and groundedness. Show how each metric can be misleading.
+6. Review the 12-page medication labels and point out any ambiguous or unsafe ground truth. Do not infer unreadable drug names.
+7. Design and critique the raw-page, enhancement, selective-retry, and Rx-crop experiments. Predict the trade-offs before seeing results.
+8. Read the measured experiment outputs and help me interpret why classical enhancement reduced F1 and why crop+trim improved CER.
+9. Explain whether the crop experiment is model fine-tuning, prompt adaptation, preprocessing, or layout adaptation.
+10. Since A1 proposed TrOCR fine-tuning, identify the minimum honest fine-tuning experiment and the labels needed to run it.
+11. Review the ingest → layout → OCR → chunking → embedding → vector-index contracts and find failure cases.
+12. Explain why 64/16 chunks beat 128/24 and 256/32 for E5 on the current labelled queries.
+13. Compare multilingual E5, signed feature hashing, and hybrid reciprocal-rank fusion for exact medicine names and Bangla paraphrases.
+14. Inspect one successful retrieval and one failed OCR page. Require page/chunk evidence for every conclusion.
+15. Review the privacy redactor against the A1 target of PII entity recall >=0.98. Identify unsupported claims and propose a labelled privacy test.
+16. Challenge the pipeline: what would fail in a viva, what cannot be claimed clinically, and what must be checked manually?
+17. Help me optimize the 4090 run without changing the evaluation protocol: batching, BF16, SDPA, length sorting, caching, retries, and OOM fallback.
+18. Review the final form, design choices, notebook outputs, index statistics, and reproducibility scripts for contradictions.
+
+REFLECTION — WRITE AFTER THE REAL SESSION
+What I initially misunderstood:
+[Your own account.]
+
+Where I challenged or corrected the AI:
+[Cite specific turns and explain the correction.]
+
+What evidence changed my decision:
+[Name the measured comparison, not a general impression.]
+
+What I implemented or verified personally:
+[Files, commands, outputs, and failures you actually handled.]
+
+What remains uncertain:
+[Fine-tuning, privacy evaluation, OCR limitations, or another genuine uncertainty.]
+
+How this conversation affected Sections 2, 3, 4 and 8:
+[Connect actual decisions to the submitted form and repository artifacts.]
+

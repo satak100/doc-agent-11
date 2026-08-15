@@ -1,0 +1,17 @@
+seed: 42
+device: cpu
+paths: {images: data/raw, index_dir: artifacts/index_hash}
+preprocess: {enabled: false, cache_dir: artifacts/preprocessed}
+enhance: {enabled: false, model: "none", type: "none"}
+layout: {model: "heading/body heuristic + PaddleOCR-VL polygons", heading_ratio: 0.22}
+ocr:
+  model: "PaddlePaddle/PaddleOCR-VL-1.6"
+  method: "cached-selective-retry"
+  cache_jsonl: artifacts/ocr/final_results.jsonl
+embed: {backend: hash, model: "signed-feature-hashing", dim: 2048, batch_size: 256}
+index: {type: "numpy-flat-cosine", chunk_tokens: 64, overlap: 16}
+retrieve: {k: 5, k_step: 5, k_max: 20, weak_threshold: 0.20, rerank: false}
+agent: {max_steps: 8, autonomy: "act-with-approval", budget_usd: 0.05}
+rl: {algo: "ppo", train_policy: false}
+serve: {batch: true}
+deploy: {target: "local"}

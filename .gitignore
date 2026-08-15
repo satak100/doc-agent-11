@@ -1,0 +1,13 @@
+data/raw/
+data/interim/
+# Clinical page images and OCR/index payloads may contain patient identifiers.
+# Keep only aggregate metrics and reproducible code in the public repository.
+grading_kit/heldout_pages/*.jpg
+artifacts/ocr/
+artifacts/ocr_variants/
+artifacts/index_e5/
+artifacts/index_hash/
+*.ckpt
+wandb/
+__pycache__/
+.venv/

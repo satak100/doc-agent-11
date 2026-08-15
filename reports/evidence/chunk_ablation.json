@@ -1,0 +1,57 @@
+{
+  "queries": 5,
+  "k": 5,
+  "variants": [
+    {
+      "chunk_tokens": 64,
+      "overlap": 16,
+      "chunks": 943,
+      "e5_build_seconds": 7.464047822984867,
+      "hash_build_seconds": 1.1909524579532444,
+      "recall_at_5": {
+        "e5": 1.0,
+        "hash": 1.0,
+        "hybrid": 1.0
+      },
+      "mean_query_ms": {
+        "e5": 7.37775641027838,
+        "hash": 0.11133397929370403,
+        "hybrid": 2.7591693913564086
+      }
+    },
+    {
+      "chunk_tokens": 128,
+      "overlap": 24,
+      "chunks": 505,
+      "e5_build_seconds": 1.7966884329216555,
+      "hash_build_seconds": 1.1615450429962948,
+      "recall_at_5": {
+        "e5": 0.8,
+        "hash": 1.0,
+        "hybrid": 1.0
+      },
+      "mean_query_ms": {
+        "e5": 2.225772407837212,
+        "hash": 0.08994981180876493,
+        "hybrid": 2.7352103730663657
+      }
+    },
+    {
+      "chunk_tokens": 256,
+      "overlap": 32,
+      "chunks": 328,
+      "e5_build_seconds": 1.662932578008622,
+      "hash_build_seconds": 1.1996621849248186,
+      "recall_at_5": {
+        "e5": 0.2,
+        "hash": 1.0,
+        "hybrid": 1.0
+      },
+      "mean_query_ms": {
+        "e5": 2.2379855858162045,
+        "hash": 0.08052175398916006,
+        "hybrid": 2.713040611706674
+      }
+    }
+  ]
+}

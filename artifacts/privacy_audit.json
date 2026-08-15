@@ -1,0 +1,20 @@
+{
+  "indexed_chunks": {
+    "records": 943,
+    "unresolved_detector_hits": {}
+  },
+  "nfr_target": {
+    "metric": "PII entity recall",
+    "status": "not_evaluated",
+    "target": 0.98
+  },
+  "raw_ocr": {
+    "detector_hits": {
+      "email": 20,
+      "patient_name": 226,
+      "phone": 330
+    },
+    "records": 310
+  },
+  "scope": "detector-visible text leakage scan; not manually labelled PII recall"
+}

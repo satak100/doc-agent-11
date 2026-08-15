@@ -1,0 +1,30 @@
+{
+  "metrics": {
+    "end_to_end_leak_rate": 0.16666666666666666,
+    "end_to_end_non_disclosure_rate": 0.8333333333333334,
+    "explicit_detection_and_redaction_recall": 0.08333333333333333,
+    "redaction_recall_conditional_on_ocr_extraction": 0.3333333333333333
+  },
+  "notes": [
+    "Manual visual labels contain counts and outcomes only; identifier values are not stored.",
+    "OCR omission prevents text-index disclosure but is not credited as explicit PII detection/redaction.",
+    "Single-reviewer pilot; expand entity types and add a second reviewer for a final NFR claim."
+  ],
+  "outcomes": {
+    "explicitly_redacted": 1,
+    "leaked_extracted": 2,
+    "ocr_omitted": 9
+  },
+  "sample": {
+    "entity_types": [
+      "patient_name"
+    ],
+    "pages": 12,
+    "visual_pii_entities": 12
+  },
+  "target": {
+    "metric": "PII entity recall",
+    "minimum": 0.98,
+    "passed": false
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "queries": 5,
+  "k": 5,
+  "systems": {
+    "multilingual_e5_small": {
+      "recall@5": 1.0,
+      "hits": 5
+    },
+    "feature_hashing": {
+      "recall@5": 1.0,
+      "hits": 5
+    },
+    "hybrid_rrf": {
+      "recall@5": 1.0,
+      "hits": 5
+    }
+  },
+  "details": [
+    {
+      "system": "multilingual_e5_small",
+      "query": "Phoscon 210mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260815-063101_Somatec.jpg"
+    },
+    {
+      "system": "multilingual_e5_small",
+      "query": "N-Bion supplement",
+      "hit": true,
+      "top_doc": "Screenshot_20260815-070248_Somatec.jpg"
+    },
+    {
+      "system": "multilingual_e5_small",
+      "query": "Fixcef Plus 500mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260815-064756_Somatec.jpg"
+    },
+    {
+      "system": "multilingual_e5_small",
+      "query": "Moxaclav prescription",
+      "hit": true,
+      "top_doc": "Screenshot_20260805-113952_Somatec.jpg"
+    },
+    {
+      "system": "multilingual_e5_small",
+      "query": "Rupadim 10mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260805-105239_Somatec.jpg"
+    },
+    {
+      "system": "feature_hashing",
+      "query": "Phoscon 210mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260805-112743_Somatec.jpg"
+    },
+    {
+      "system": "feature_hashing",
+      "query": "N-Bion supplement",
+      "hit": true,
+      "top_doc": "Screenshot_20260815-004503_Somatec.jpg"
+    },
+    {
+      "system": "feature_hashing",
+      "query": "Fixcef Plus 500mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260815-004555_Somatec.jpg"
+    },
+    {
+      "system": "feature_hashing",
+      "query": "Moxaclav prescription",
+      "hit": true,
+      "top_doc": "Screenshot_20260805-113952_Somatec.jpg"
+    },
+    {
+      "system": "feature_hashing",
+      "query": "Rupadim 10mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260805-105239_Somatec.jpg"
+    },
+    {
+      "system": "hybrid_rrf",
+      "query": "Phoscon 210mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260815-062822_Somatec__1RR0EEAz.jpg"
+    },
+    {
+      "system": "hybrid_rrf",
+      "query": "N-Bion supplement",
+      "hit": true,
+      "top_doc": "Screenshot_20260815-004503_Somatec.jpg"
+    },
+    {
+      "system": "hybrid_rrf",
+      "query": "Fixcef Plus 500mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260815-061609_Somatec__1SSoVkX2.jpg"
+    },
+    {
+      "system": "hybrid_rrf",
+      "query": "Moxaclav prescription",
+      "hit": true,
+      "top_doc": "Screenshot_20260805-113952_Somatec.jpg"
+    },
+    {
+      "system": "hybrid_rrf",
+      "query": "Rupadim 10mg",
+      "hit": true,
+      "top_doc": "Screenshot_20260805-105239_Somatec.jpg"
+    }
+  ]
+}

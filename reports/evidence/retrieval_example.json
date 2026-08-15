@@ -1,0 +1,10 @@
+{
+  "query": "Phoscon 210mg",
+  "method": "hybrid RRF over multilingual E5-small and feature hashing",
+  "rank": 1,
+  "chunk_id": "page:a66ce32fc45cfd08:3",
+  "doc_id": "Screenshot_20260815-062822_Somatec__1RR0EEAz.jpg",
+  "score": 0.031754032258064516,
+  "evidence": "Tab. Phoscon (210mg)",
+  "judgement": "correct"
+}
