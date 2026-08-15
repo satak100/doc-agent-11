@@ -1,0 +1,419 @@
+# A2 AI Conversation — Satak Kumar Dey
+
+## HEADER
+
+Project ID: 11
+Project: Pharmacological Query from Prescription
+Student: Satak Kumar Dey
+Student ID: 2105100
+Team size: 2
+Sections led: 2, 3, 4 and 8
+Data authorization: The prescription data was obtained with proper permission from Somatec Pharmaceuticals Ltd. and supplied through the proper organizational/project channel for academic use. Raw clinical data remains restricted.
+AI system used: ChatGPT — GPT-5.6 Sol
+Conversation date(s): 2026-08-15
+Conversation link/export reference: Not available; transcript text was supplied directly by the student.
+
+## FULL CONVERSATION
+
+Transcript integrity note: The text supplied by the student starts with the AI's substantive response. The initiating user prompt was not included, so it has not been reconstructed or invented here.
+
+### 1. Explain the assignment requirements and identify the A2 artifacts.
+
+I inspected `forms/A2_form.docx`, `SUBMISSION.md`, the project specification, codebase guide, configs, notebooks, reports, grading kit and source code.
+
+A2 is the knowledge-base milestone. The required working path is:
+
+scanned pages → ingest/preprocess → optional enhancement → layout → OCR/HTR → chunking → embedding → vector index → retrieval evidence.
+
+The required A2 artifacts are the filled `forms/A2_form.docx`; implemented ingest, vision and index code under `src/doc_agent/`; `scripts/build_index.sh`; executed `notebooks/kb_demo.ipynb`; `reports/pipeline_diagram.md`; `configs/design_choices.md`; and one genuine transcript per member, including `transcripts/2105100.txt`.
+
+The 2026 instructions also carry forward A1 artifacts: `configs/task.yaml`, `data/provenance.md`, the corpus or `scripts/get_data.sh`, `notebooks/eda.ipynb`, `grading_kit/manifest.yaml`, and `grading_kit/heldout_pages/` with labels.
+
+There is a real documentation contradiction. The beginning/end of the A2 form mentions a submission ZIP, but the same form's main “What to hand in” section and `SUBMISSION.md` say to push a public GitHub repository and create the `a2-submit` tag, explicitly saying not to upload a ZIP. This needs instructor clarification if there is any doubt. The detailed GitHub instructions are the more operationally specific instructions.
+
+The form itself now correctly represents the project as a two-member team by putting “Not applicable (two-member team)” under Student 3, although the generic heading still says “Team of 3.”
+
+### 2. Inspect the prescriptions: handwriting, layout, code-switching, image quality and privacy.
+
+I visually inspected the 12 held-out prescription images.
+
+The handwriting varies substantially between prescribers. Some medicine lines are quite readable, while others contain joined strokes, open letter forms, compressed characters and digits whose identity depends on context. Medication strings are particularly unforgiving because one wrong letter or digit can change the medication or strength.
+
+The layout is mixed rather than plain text. Pages contain printed doctor/chamber information, patient fields, clinical complaints, investigation notes, Rx markers, handwritten medication lines, Bangla dosage/duration instructions, stamps and signatures. Different templates place these elements in different locations. This explains why reading the whole page as one undifferentiated image can waste model capacity on headers instead of the Rx body.
+
+Code-switching is obvious. Drug brands and units are predominantly Latin-script strings such as `Phoscon`, `N-Bion`, `mups`, `mg`, while instructions and durations are often handwritten in Bangla. Some clinical abbreviations are also in English or Latin-style notation. A monolingual lexical representation therefore loses information.
+
+Image quality is inconsistent. The corpus contains perspective changes, shadows, uneven brightness, fingers/clips, photographed rather than perfectly scanned paper, different resolutions, low-contrast handwriting and repeated printed backgrounds. The EDA reports 310 pages with substantial brightness and contrast variation.
+
+Privacy is not theoretical. The images visibly contain patient-name fields and can also contain age, contact information, clinical complaints and other health information. The project states that raw clinical pages are restricted.
+
+That creates a **serious submission contradiction**: the ZIP currently contains identifiable raw held-out prescription images under `grading_kit/heldout_pages/`, while the submission instructions require a public GitHub repository and the provenance says raw prescriptions must remain access-controlled. Unless the authorization explicitly permits public redistribution of those particular pages, they should not simply be pushed to a public repository. This should be resolved with the instructor/data owner before submission.
+
+### 3. Compare conventional OCR, TrOCR, PaddleOCR-VL and another published method.
+
+A reasonable four-method comparison is Tesseract, TrOCR, PaddleOCR-VL 1.6 and Donut.
+
+Tesseract is the conventional OCR baseline. It is useful because it gives a low-complexity reference for how traditional OCR behaves before domain adaptation.
+
+TrOCR is an end-to-end Transformer OCR model using a visual Transformer encoder and text Transformer decoder. The published method explicitly supports fine-tuning on human-labelled recognition data.
+
+PaddleOCR-VL is closer to modern multimodal document parsing than traditional line OCR. The current Paddle documentation identifies PaddleOCR-VL-1.6 as the latest model in that series, and the 1.6 work describes an enhanced compact document-parsing model. Your project reproduces/adapts the pretrained `PaddlePaddle/PaddleOCR-VL-1.6` checkpoint without weight updates.
+
+Donut is an OCR-free document-understanding Transformer. That makes it an interesting architectural comparison, but it is not an ideal apples-to-apples CER baseline because its intended task includes document understanding rather than only transcription.
+
+There are two meanings of “fair baseline.” **Tesseract is a fair conventional baseline.** However, if the question is whether TrOCR fine-tuning helps, the strongest causal baseline is the **same frozen TrOCR checkpoint before fine-tuning**. Comparing frozen TrOCR against fine-tuned TrOCR changes one important variable rather than changing the entire architecture.
+
+The current project has measured PaddleOCR-VL evidence, but no measured Tesseract-versus-TrOCR experiment in this ZIP. That distinction should remain explicit.
+
+### 4. Define a leakage-safe train/validation/heldout split.
+
+The course specification itself warns to split by document, not by individual page when pages from the same scan/document can cross splits.
+
+For this corpus I would first create grouping IDs before assigning a split. Each group should include exact duplicates, resized/recompressed copies, duplicate Drive objects and perceptually near-identical images. Because the provenance records 25 duplicate-name pairs preserved using Drive-ID suffixes, filename identity alone is not a safe grouping rule.
+
+A defensible future training split would be something like 70% train, 15% validation and 15% heldout **by group**, not raw image count. The exact percentage is less important than the grouping.
+
+The current 12 held-out pages should remain untouched. They should not be used to choose enhancement settings, crop rules, retry thresholds, epochs or prompts after looking at their measured scores. If the current experiments were repeatedly chosen based on those same 12 pages, they function partly as a development set rather than a truly untouched final test set.
+
+For template leakage, I would also record a template-family ID. Exact or near-identical template scans must stay in one split. A separate template-generalization evaluation can intentionally hold out an entire template family.
+
+The current `Page.id` implementation hashes the **relative filename**, not image content. Therefore two identical images under different filenames receive different IDs. Content/perceptual deduplication must happen outside that ID mechanism.
+
+### 5. Explain CER, WER, medication entity F1, retrieval recall@k and groundedness.
+
+**CER** is character edit distance divided by reference characters. It catches spelling/digit mistakes well. It can mislead because a low global CER can be dominated by easy text while the medically important drug string is wrong.
+
+**WER** performs edit distance at word level. It is intuitive but harsh about tokenization. One spacing error can turn an almost-correct phrase into several word errors.
+
+**Medication-entity precision** asks what fraction of predicted medication entities were accepted as correct. **Recall** asks what fraction of labelled medications were recovered. **F1** combines them.
+
+There is an important project-specific caveat: `scripts/evaluate_ocr.py` calls its metric “fuzzy entity F1” and counts a medication pair as matching at normalized Levenshtein similarity `>= 0.75`. That can be useful for measuring approximate OCR, but in a medical system it can also classify a sufficiently similar **wrong drug or wrong strength** as a true positive. Therefore this F1 must not be described as clinical medication correctness.
+
+**Retrieval recall@k** measures whether a relevant result appears anywhere in the first `k` retrieved chunks. Your five-query evaluation gives recall@5 = 1.00 for E5, hashing and hybrid. But five queries are a very small set, and recall@5 can hide poor rank ordering. A system can score 1.00 while the useful result frequently appears at rank 5 rather than rank 1.
+
+Your current retrieval labels are also mostly exact Latin-script medicine-name queries. That does not yet demonstrate the claimed benefit for real Bangla paraphrases.
+
+**Groundedness** asks whether answer claims are supported by retrieved evidence. It can also mislead: an answer may faithfully quote **incorrect OCR** and therefore be textually grounded but clinically wrong. Groundedness is not equivalent to medical correctness.
+
+### 6. Review the 12-page medication labels for ambiguous ground truth.
+
+The 12 JSONL rows contain 61 medication entries. Several pages are clear enough for evaluation, but some labels deserve adjudication.
+
+On `Screenshot_20260815-061742_Somatec__1SOQr-5t.jpg`, several handwritten medicine strings are difficult enough that I would not certify the exact canonical spelling from pixels alone. The first medicine and the final “Napa …” string especially should be second-reviewed rather than inferred from a drug dictionary.
+
+On `Screenshot_20260815-064059_Somatec.jpg`, some strokes in the first and second drug names are ambiguous. The labels may be correct, but a second annotator should independently confirm them without being shown the current canonical labels first.
+
+On `Screenshot_20260805-112207_Somatec.jpg`, the entry labelled `Zecfol-Cl` is visually less certain than lines such as `N-Bion` or `Viset 50 mg`. I would mark the uncertain characters for adjudication rather than using brand familiarity to fill them.
+
+On `Screenshot_20260805-115847_Somatec.jpg`, the last characters of the `Folic-CI` label are visually easy to confuse. That should be explicitly adjudicated.
+
+The safest annotation scheme should distinguish:
+
+`literal_transcription` — exactly what two annotators can defend from the image;
+
+`canonical_entity` — a normalized medicine identity, only when independently verified;
+
+`uncertain/unreadable` — where exact characters cannot be supported.
+
+Do not silently convert an unreadable handwritten string into a known medicine name just because that medicine seems plausible.
+
+### 7. Design and critique raw-page, enhancement, selective-retry and Rx-crop experiments.
+
+The experiments should share exactly the same held-out pages and scoring code.
+
+**Raw page** is the control. It preserves all information but gives the model large amounts of irrelevant header, stamp and template content.
+
+**Classical enhancement** in this repository uses EXIF correction, autocontrast with 1% cutoff, a 3×3 median filter and sharpness factor 1.35. Before looking at results, I would predict that it could improve strong printed text but damage faint or thin handwriting by modifying subtle strokes.
+
+**Selective retry** keeps the main OCR path and reruns generations that hit the token ceiling with a larger 1,536-token cap. The repository also removes obvious repetitive autoregressive tails. This may recover truncated content, but it increases compute and can also generate more wrong text.
+
+**Rx crop** uses the OCR spotting result to find the Rx anchor when possible and crops away content above/left of that region. This should increase the effective resolution and attention devoted to medicine lines. Its risk is cutting away relevant page context or relying on a wrong Rx anchor.
+
+The most important methodological rule is that the crop/retry choice cannot be made using the true label for each page at test time.
+
+### 8. Interpret the measured experiment outputs.
+
+The measured 12-page/61-medication results are:
+
+Raw 768-token PaddleOCR-VL:
+CER 0.499, WER 0.702, entity F1 0.490.
+
+Selective retry + trimming:
+CER 0.516, WER 0.720, F1 0.500.
+
+Classical enhancement:
+CER 0.607, WER 0.789, F1 0.413.
+
+Rx crop + trimming:
+CER 0.413, WER 0.702, F1 0.505.
+
+Enhancement therefore made every listed OCR metric worse. F1 fell from 0.490 to 0.413 and CER worsened from 0.499 to 0.607. That is consistent with the enhancement pipeline altering thin/faint handwriting features that the pretrained model needed. This explanation is plausible because the preprocessing includes autocontrast, median filtering and sharpening, but it should still be called an interpretation unless stroke-level before/after examples are documented.
+
+Crop+trim gives the best CER and F1. The likely reason is layout competition: irrelevant printed headers no longer consume as much input/model capacity and handwriting occupies a larger proportion of the effective image. The failed page discussed later strongly supports this mechanism because whole-page OCR recovered zero medication lines whereas the Rx crop recovered five approximate lines.
+
+The selective retry result shows why one metric can mislead: F1 improves slightly from 0.490 to 0.500 while CER and WER worsen. The longer generation finds some additional entities while also producing more transcription errors.
+
+### 9. Is cropping fine-tuning, prompt adaptation, preprocessing or layout adaptation?
+
+It is **not model fine-tuning** because no OCR weights are updated.
+
+It is not really prompt adaptation either, because the relevant experimental change is the visual region supplied to the OCR model.
+
+It is best described as **layout adaptation implemented through preprocessing/cropping**. The OCR checkpoint remains pretrained and frozen.
+
+The final form correctly says “pretrained, adapted; not fine-tuned.”
+
+### 10. Minimum honest TrOCR fine-tuning experiment.
+
+There is an important course contradiction to resolve. The project specification says students should “fine-tune a pretrained recognizer on the corpus,” and the Codebase Guide's A2 checklist likewise describes the OCR baseline as fine-tuning a pretrained model. Your current A2 implementation deliberately states that PaddleOCR-VL is pretrained and **not fine-tuned**.
+
+Because A1 proposed TrOCR fine-tuning, the minimum honest experiment is:
+
+1. Select one fixed pretrained TrOCR checkpoint.
+2. Evaluate the frozen checkpoint.
+3. Fine-tune the same checkpoint only on training images.
+4. Select epoch/hyperparameters using a validation split.
+5. Evaluate both frozen and fine-tuned checkpoints on the same untouched heldout pages.
+6. Report CER/WER/entity metrics plus training configuration, checkpoint, seed and logs.
+
+TrOCR was explicitly designed for pretraining followed by fine-tuning on human-labelled text-recognition data.
+
+The required labels are **image region/line → exact transcription pairs**. The present 61-item medication list does not by itself provide sufficient training supervision unless each medication is accurately aligned with a corresponding line/crop. You need additional labelled training/validation lines outside the 12 heldout pages.
+
+Do not report “TrOCR fine-tuning” if no weight update/checkpoint exists.
+
+### 11. Review the ingest → layout → OCR → chunk → embedding → index contracts.
+
+I found several concrete failure cases.
+
+`Page.id` is derived from the relative path rather than image content, so duplicate images with different filenames are not automatically identified.
+
+`Region` has page ID, bounding box and kind, but the main OCR implementation does not actually crop and transcribe each region. `vision/ocr.py` retrieves cached **whole-page OCR once per page** and ignores the region bounding boxes. Therefore the main `heading/body` layout stage does not constrain OCR in the core pipeline. The Rx-crop experiment exists in a separate experiment script. The form should not imply stronger layout→OCR integration than the code provides.
+
+Paddle spotting location tokens are cleaned from text instead of being preserved as evidence coordinates. After that, `Chunk` contains only text, document ID and page IDs. The chunk therefore cannot identify the exact image bounding box that supports a retrieved medicine.
+
+Chunking applies NFKC and whitespace tokenization. That is reproducible, but the script-profile result is only used when computing index statistics. “Bangla/Latin script ID” is **not stored as chunk metadata or used by the retriever**, so claims that script ID itself improves retrieval are currently too strong.
+
+The E5 path is correctly prefixed with `query:` and `passage:` and produces normalized vectors. Multilingual E5 was trained specifically as a multilingual text-embedding family.
+
+The store verifies one vector per chunk but does not persist the full OCR/preprocessing/chunk configuration alongside the index. A stale index could therefore survive a changed OCR or chunk configuration unless scripts/directories are managed carefully.
+
+One thing I rechecked from the earlier starter inspection: the PII hook problem is fixed in this newer ZIP. `pipeline.py` now uses the context returned from `hooks.run(AFTER_OCR, ...)`, so replacement redacted Chunk objects continue into indexing.
+
+### 12. Why did 64/16 beat 128/24 and 256/32 for E5?
+
+The measured chunk ablation is:
+
+64/16: 943 chunks; E5 recall@5 = 1.00.
+128/24: 505 chunks; E5 recall@5 = 0.80.
+256/32: 328 chunks; E5 recall@5 = 0.20.
+
+Hash and hybrid recall remained 1.00 at all three sizes.
+
+The likely reason is that prescription evidence is locally concentrated. A short query such as a drug name benefits from a chunk where that drug and its immediate dose/context occupy a large fraction of the representation. With a 256-word chunk, several medicines, header text and instructions can be blended into one dense vector, reducing the salience of one rare exact medication string.
+
+The 16-word overlap also protects short medication evidence near chunk boundaries.
+
+But this is only five labelled retrieval queries, so the evidence supports: **“64/16 performed best on our current five-query E5 ablation.”** It does not support the universal claim that 64/16 is best for E5.
+
+### 13. Compare multilingual E5, signed feature hashing and hybrid RRF.
+
+Multilingual E5 provides the semantic component and is the natural candidate for Bangla/English paraphrases because the model family was trained on multilingual text pairs.
+
+The project's signed feature hashing is a lexical representation. In this implementation it hashes normalized **word-like tokens**, not character n-grams. That makes it useful for exact strings such as medicine names, but less robust than character n-grams would be to OCR misspellings or internal character corruption.
+
+Hybrid RRF combines **rank positions** rather than trying to calibrate E5 cosine scores against hashing scores. That is a sensible design when the two systems produce fundamentally different score distributions.
+
+The current five-query result is 1.00 recall@5 for all three systems, so the measured data does **not yet prove that hybrid is superior**. It only shows that hybrid retained the successes of both on this small set.
+
+Also, the current queries are mostly exact English medication queries such as `Phoscon 210mg`, `Fixcef Plus 500mg` and `Rupadim 10mg`. To justify the claim about Bangla paraphrases, add labelled Bangla natural-language queries whose relevant evidence does not contain the same surface tokens.
+
+### 14. Inspect one successful retrieval and one failed OCR page.
+
+Successful retrieval evidence:
+
+Query: `Phoscon 210mg`
+Method: hybrid RRF
+Rank: 1
+Chunk ID: `page:a66ce32fc45cfd08:3`
+Document: `Screenshot_20260815-062822_Somatec__1RR0EEAz.jpg`
+Retrieved text: `Tab. Phoscon (210mg)`
+Judgement: correct.
+
+This is a properly evidence-backed retrieval example because the query, rank, chunk, document and returned text are all stored in `reports/evidence/retrieval_example.json`.
+
+Failed OCR evidence:
+
+Page: `Screenshot_20260815-063516_Somatec.jpg`
+Gold labels: five medicines.
+Raw-page baseline prediction: no extracted medication candidates, giving 0/5 medication recovery on that page.
+
+The Rx-crop+trim prediction recovered five approximate lines corresponding to the five labelled rows, including approximate forms of Fixcef Plus, Dextac, Viset, Coralmet-D and ATOZ. Several characters/strength strings remain incorrect.
+
+The supported conclusion is therefore: **whole-page processing failed to reach the medicine body; crop processing recovered medicine-line structure but did not produce clinically reliable transcription.**
+
+I would not conclude that any questionable OCR spelling is the correct medicine without checking the page image.
+
+### 15. Review the privacy redactor against PII recall ≥0.98.
+
+The regex audit initially looks strong: raw OCR contains hundreds of detector-visible email/name/phone occurrences, while the final indexed chunks have zero unresolved matches for those **same detector patterns**.
+
+But that is not recall, because a detector cannot measure identifiers that it never recognized.
+
+The manually labelled pilot gives the more honest result:
+
+12 pages
+12 visually present patient-name entities
+1 explicitly detected and redacted
+2 OCR-extracted names leaked into the index
+9 patient names omitted by OCR.
+
+Therefore:
+
+explicit detection/redaction recall = 1/12 = **0.0833**
+
+conditional redaction recall when OCR extracted the name = 1/3 = **0.3333**
+
+end-to-end non-disclosure = 10/12 = **0.8333**
+
+The target PII entity recall ≥0.98 therefore **fails**.
+
+OCR omission should not be counted as successful PII detection. It happens to prevent text-index disclosure, but it demonstrates nothing about redactor quality.
+
+The current detector only handles email, Bangladesh-format phones and English lines matching `Name:`. It can miss Bangla name labels, clipped labels, OCR-corrupted `Name`, addresses, registration IDs and other identifier types.
+
+A proper final privacy holdout should independently annotate patient names, phones, emails, patient/registration IDs, full addresses and other in-scope identifiers. It should preferably use two reviewers/adjudication, score each type separately, and score both detector-only recall on gold text and end-to-end image→index leakage.
+
+Most urgently, public GitHub publication of the identifiable heldout images must be resolved because regex redaction of indexed text does not anonymize the raw JPEGs.
+
+### 16. What would fail in a viva, what cannot be claimed clinically, and what needs manual checking?
+
+The following claims would be vulnerable in a viva:
+
+* saying OCR was fine-tuned when no weights were updated;
+* saying 64/16 is generally optimal from only five queries;
+* saying hybrid outperforms E5/hash when all three achieved 1.00 recall@5;
+* claiming Bangla paraphrase performance without Bangla paraphrase queries;
+* saying privacy ≥0.98 when the pilot gives 0.0833 explicit recall;
+* presenting zero regex residuals as a PII recall result;
+* saying layout regions drive core OCR when the cached OCR path ignores Region bounding boxes;
+* describing fuzzy entity F1 as medication correctness;
+* claiming clinical safety from CER/retrieval metrics;
+* putting restricted identifiable prescription pages into a public repository without clear redistribution permission.
+
+Clinically, this system cannot claim that a medication, strength, frequency or duration is correct, appropriate or safe. It is a search/review tool, not a prescribing or dispensing system.
+
+Manual checks should include every retrieved medicine name, strength/unit, frequency, duration, unusual abbreviation, unreadable line, OCR correction, PII leak and page/chunk citation.
+
+### 17. Optimize the RTX 4090 run without changing evaluation.
+
+Your GPU runner already implements most of the right ideas.
+
+It sorts images by dimensions so similar shapes are batched together. It uses batching, `torch.inference_mode()`, BF16 model weights, PyTorch SDPA attention, left padding, cache-enabled deterministic generation, resumable JSONL outputs, selective retry only for capped generations, and recursive OOM fallback that splits the batch without changing the sample.
+
+That preserves evaluation better than reducing image resolution or output length after an OOM.
+
+Additional discipline:
+
+keep the same dtype/model/decoding settings across compared variants;
+
+cache the raw OCR because chunk and retrieval ablations do not need to rerun vision;
+
+cache embeddings when only the index/search implementation changes;
+
+record which samples used OOM fallback;
+
+do not choose retry/crop based on heldout gold errors;
+
+preserve sample IDs after size sorting so evaluation order cannot be mixed up.
+
+I also found a reproducibility contradiction: `reports/a2_readiness.md`/`build_index.sh` refer to a tested environment using much newer Transformers/PyTorch for the PaddleOCR-VL 1.6 runner, but `pyproject.toml` and `requirements.lock` pin `torch==2.3.1` and `transformers==4.44.2`. Those older constraints should be reconciled with the environment actually used for PaddleOCR-VL 1.6.
+
+I attempted to import `transformers` in the AI inspection container to test the runner API directly, but that attempt failed with `ModuleNotFoundError` because this inspection environment does not have Transformers installed. I therefore did **not** use that failed import as evidence about whether your pinned version can run the model.
+
+### 18. Review the final form, design choices, notebook outputs, index stats and reproducibility scripts.
+
+The current ZIP is substantially more complete than the earlier starter.
+
+Verified evidence:
+
+`notebooks/eda.ipynb` is executed and reports 310 pages and 42,642 OCR word occurrences.
+
+`notebooks/kb_demo.ipynb` is executed and prints all four OCR comparisons plus the real Phoscon retrieval.
+
+The E5 index contains 310 documents, 943 chunks, 384 dimensions and 1,448,448 vector bytes.
+
+The hash index contains the same 943 chunks, 2,048 dimensions and 7,725,056 vector bytes.
+
+The measured E5 build time is 7.304 s and hash build time 1.373 s after OCR.
+
+`PYTHONPATH=src pytest -q -rs` completed without test failures, but **nine tests are deliberately skipped**, including agent, grounding, security, PII, tracing, reproducibility, data validation, evaluation and smoke coverage. Therefore “all tests pass” would be misleading without also mentioning the skips.
+
+This extracted ZIP does not contain a `.git` directory, so I cannot verify team commit attribution, remote repository state or an `a2-submit` tag from it.
+
+Remaining contradictions or weak points:
+
+1. The manifest says the project has 42,642 words, below the stated 60,000-word course floor. The form should not hide that.
+2. The form and `SUBMISSION.md` disagree about ZIP versus GitHub-tag submission.
+3. Raw heldout prescriptions contain visible identifiers while the project says raw data is restricted and submission is to a public repository.
+4. A1/course guidance expects OCR fine-tuning, while A2 uses pretrained PaddleOCR-VL without weight updates.
+5. Layout is described as heading/body plus Paddle polygons, but core OCR does not consume Region bounding boxes.
+6. Script profiling is reported in index statistics but is not stored/used as a retrieval feature.
+7. The five-query retrieval set is too small to support strong generalization claims or Bangla-paraphrase claims.
+8. The fuzzy 0.75 medication match threshold can overstate clinically meaningful entity correctness.
+9. The privacy target currently fails.
+10. The GPU reproduction environment described in reports does not match the versions pinned in `requirements.lock`.
+11. `data/raw/` is empty in the submitted ZIP; this is acceptable only insofar as the authorized downloader/script is the intended reproducibility path and does not cause restricted clinical data to be publicly redistributed.
+12. The current A2 form is technically strong about acknowledging that OCR is not clinically validated; that limitation should be preserved.
+
+My highest-priority pre-submission fixes would therefore be: resolve the public-repo/raw-PII conflict; reconcile the runtime dependency versions; decide how to satisfy or obtain clarification on the fine-tuning requirement; explicitly acknowledge the <60k word count; strengthen privacy testing; and avoid overstating the five-query retrieval result.
+
+## REFLECTION
+
+### What I initially misunderstood
+
+I initially treated several repository claims as if having a configured pipeline was enough evidence for them. The discussion made me separate implementation from measurement. In particular, pretrained PaddleOCR-VL adaptation is not fine-tuning, zero regex matches in the final index is not PII recall, and retrieval recall@5 on five exact-name queries is not evidence of general Bangla paraphrase performance.
+
+I also did not initially appreciate how important the exact evaluation scope is. The reported CER/WER/F1 values evaluate medication-name/strength lines, not a complete clinically correct transcription of every prescription field.
+
+### Where I challenged or corrected the AI
+
+The first repository supplied in the earlier turn looked like an incomplete starter, so the AI initially reported that measured OCR, privacy and retrieval evidence was unavailable. I then supplied the newer `doc-agent-starter.zip`. On reinspection, the AI changed its conclusion because this ZIP contained the executed notebooks, 12 heldout pages, 61 medication labels, OCR ablations, chunk ablation, retrieval evidence, privacy pilot and final index statistics.
+
+This correction was important because conclusions 8, 12, 14 and 15 could then be based on measured artifacts instead of hypothetical explanations.
+
+### What evidence changed my decision
+
+The strongest OCR comparison was the measured four-way ablation. Classical enhancement reduced entity F1 from 0.490 to 0.413 and worsened CER from 0.499 to 0.607, so it should not be enabled merely because enhanced images look cleaner. Rx crop+trim improved CER to 0.413 and F1 to 0.505, so I would keep cropping as a recovery path rather than assume classical enhancement is beneficial.
+
+The chunk ablation also changed the design decision: E5 recall@5 was 1.00 at 64/16, 0.80 at 128/24 and 0.20 at 256/32 on the five labelled queries.
+
+The most important negative evidence was the privacy pilot. Explicit PII detection/redaction recall was only 0.0833 against the A1 target of ≥0.98. That means the privacy NFR cannot be claimed as achieved.
+
+### What I implemented or verified personally
+
+During this session I supplied the current project ZIP and checked the project's reported artifacts against the AI's inspection. The repository snapshot contains the filled A2 form, configs, executed EDA and KB-demo notebooks, OCR evidence, chunk/retrieval evidence, privacy evidence and two built index-stat files.
+
+The AI independently ran the test suite on the supplied snapshot and found no failures but nine skipped tests. It also found that the extracted snapshot has no `.git` metadata, so GitHub commits/tag status cannot be verified from this ZIP.
+
+Before submission I should personally rerun the critical reproduction commands in our actual project environment, especially the index build/evaluation/privacy scripts, and verify the GitHub `a2-submit` tag rather than relying only on the uploaded snapshot.
+
+### What remains uncertain
+
+The largest unresolved issue is the fine-tuning requirement. A1 proposed TrOCR fine-tuning and the course specification describes fine-tuning a pretrained OCR model, but the measured A2 reader is pretrained PaddleOCR-VL 1.6 without weight updates. Either an honest fine-tuning experiment needs to be run using additional aligned transcription labels or the team needs instructor clarification.
+
+Privacy also remains unresolved because the 12-page pilot covers patient names only and fails the target. More PII entity types and independent annotation are required.
+
+OCR quality remains too weak for clinical interpretation. Even the best measured crop result has entity F1 around 0.505.
+
+There is also a data-governance uncertainty that must be resolved before public submission: identifiable heldout prescription images are present while raw data is described as restricted.
+
+### How this conversation affected Sections 2, 3, 4 and 8
+
+For **Section 2**, I would retain the emphasis on handwriting strokes, repeated template structure, Bangla/English code-switching and invariance to harmless layout/noise, but explicitly distinguish those from medication spelling/strength changes that must never be normalized silently.
+
+For **Section 3**, I would describe PaddleOCR-VL as a reproduced/adapted pretrained method, not fine-tuned; use Tesseract as a conventional reference; and explain that frozen TrOCR is the proper baseline for any claimed TrOCR fine-tuning experiment. I would also preserve the measured rejection of classical enhancement and selection of 64/16 chunking.
+
+For **Section 4**, I would ensure the form exactly matches what runs: pretrained PaddleOCR-VL 1.6, BF16/SDPA, selective retry, Rx crop as a recovery experiment, 64/16 chunks, multilingual E5-small, signed feature hashing, exact cosine indexes and hybrid RRF. I would avoid implying that the core layout regions directly drive OCR when the cached OCR path currently operates once per page.
+
+For **Section 8**, this conversation provides genuine evidence of AI use because the AI did not simply agree with the form. It identified the failed privacy target, the lack of fine-tuning, the small retrieval evaluation, the fuzzy medication metric, the layout/OCR contract mismatch, the dependency-version contradiction, nine skipped tests, the <60k corpus size and the conflict between restricted raw clinical images and public GitHub submission. Those corrections and limitations should remain in the transcript rather than being edited out.
