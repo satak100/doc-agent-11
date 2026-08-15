@@ -15,7 +15,34 @@ Conversation link/export reference: Not available; transcript text was supplied 
 
 ## FULL CONVERSATION
 
-Transcript integrity note: The text supplied by the student starts with the AI's substantive response. The initiating user prompt was not included, so it has not been reconstructed or invented here.
+Transcript integrity note: The original initiating prompt was not present in the pasted export supplied by the student. The prompt below was reconstructed from the supplied 18-part response and the matching session template. It is included for context and is **not represented as a verbatim platform export**.
+
+### USER PROMPT — RECONSTRUCTED, NOT VERBATIM
+
+I am Satak Kumar Dey (2105100), a member of Project 11, “Pharmacological Query from Prescription.” Our two-member team is completing A2 for a permissioned handwritten-prescription knowledge base. I led Sections 2, 3, 4 and 8. Inspect the supplied project repository and evidence carefully. Help me understand the project rather than merely completing it for me. Challenge unsupported claims, distinguish measured results from assumptions, and point out contradictions that could cause problems in the report, submission or viva. Do not reveal patient identifiers and do not infer unreadable medicine names.
+
+Please address these topics in order:
+
+1. Explain the assignment requirements and identify every required A2 artifact.
+2. Inspect the prescriptions and explain the handwriting, layout, Bangla/English code-switching, image-quality and privacy difficulties.
+3. Compare conventional OCR, TrOCR, PaddleOCR-VL and another published/pretrained document method. Explain what constitutes a fair baseline.
+4. Define a leakage-safe train/validation/heldout split, including duplicate and template-family handling.
+5. Explain CER, WER, medication-entity precision/recall/F1, retrieval recall@k and groundedness, including how each metric can mislead.
+6. Review the 12-page medication labels and identify ambiguous or unsafe ground truth without guessing unreadable characters.
+7. Design and critique the raw-page, classical-enhancement, selective-retry and Rx-crop experiments before interpreting their results.
+8. Interpret the measured OCR experiment outputs and explain why enhancement reduced performance while crop+trim improved CER/F1.
+9. Classify Rx cropping correctly: is it fine-tuning, prompt adaptation, preprocessing or layout adaptation?
+10. Since A1 proposed TrOCR fine-tuning, define the minimum honest fine-tuning experiment and the labels required.
+11. Review the ingest → layout → OCR → chunking → embedding → vector-index contracts and identify concrete failure cases or mismatches.
+12. Explain why 64-word chunks with 16-word overlap outperformed 128/24 and 256/32 for E5 on the measured queries.
+13. Compare multilingual E5, signed feature hashing and hybrid reciprocal-rank fusion, including what the current experiment does and does not prove.
+14. Inspect one successful retrieval and one failed OCR page, requiring page/chunk evidence for every conclusion.
+15. Review the privacy redactor against the A1 target of PII entity recall ≥0.98 and distinguish regex residual scanning from real recall.
+16. Identify what would fail in a viva, what cannot be claimed clinically, and what requires manual checking.
+17. Explain how to optimize the RTX 4090 run without changing the evaluation protocol or compromising reproducibility.
+18. Review the final form, design choices, executed notebooks, index statistics, tests and reproducibility scripts for contradictions and remaining submission risks.
+
+### ASSISTANT RESPONSE
 
 ### 1. Explain the assignment requirements and identify the A2 artifacts.
 
