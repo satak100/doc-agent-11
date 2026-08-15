@@ -1,0 +1,285 @@
+# A2 AI Conversation — Jannatul Ferdous Prity
+
+## HEADER
+
+Name: Jannatul Ferdous Prity
+Student ID: 2105113
+Project ID: 11
+Project: Pharmacological Query from Prescription
+Team size: 2
+Sections led: Sections 1, 5, 6, 7 and 8
+AI system: GPT-5.6 Sol
+Date: 2026-08-15 (Asia/Dhaka)
+
+Data statement retained:
+The prescription data was obtained with proper permission from Somatec Pharmaceuticals Ltd. and supplied through the proper organizational/project channel for academic research. Raw clinical pages remain restricted and will not be redistributed without authorization.
+
+## FULL CONVERSATION — CHRONOLOGICAL, UNEDITED FOR THE RECORDED TURNS
+
+USER:
+PRITY — USE THIS TO CREATE YOUR REAL A2 TRANSCRIPT
+
+Project ID: 11
+Project: Pharmacological Query from Prescription
+Name: Jannatul Ferdous Prity
+Student ID: 2105113
+Sections led: Sections 1, 5, 6, 7 and 8
+
+Data statement to retain:
+The prescription data was obtained with proper permission from Somatec Pharmaceuticals Ltd. and supplied through the proper organizational/project channel for academic research. Raw clinical pages remain restricted and will not be redistributed without authorization.
+
+STEP 1 — START A NEW AI CHAT
+
+Attach or make available these project files if the AI cannot inspect the repository directly:
+- forms/A2_form.docx
+- configs/task.yaml
+- configs/design_choices.md
+- reports/eval_report.md
+- reports/privacy_audit.md
+- reports/pipeline_diagram.md
+- artifacts/pii_holdout_metrics.json
+- artifacts/index_e5/index_stats.json
+- notebooks/kb_demo.ipynb
+
+STEP 2 — PASTE THIS AS YOUR FIRST PROMPT
+
+I am Jannatul Ferdous Prity (2105113), a member of Project 11, “Pharmacological Query from Prescription.” Our two-member team is building an ingest → layout → OCR → chunking → embedding → vector-index pipeline for permissioned handwritten medical prescriptions. I led A2 Sections 1, 5, 6, 7 and 8. Teach me the project carefully, but do not simply agree with me or write unsupported claims. Inspect the evidence I provide, ask me questions, challenge inconsistencies, and require measured results for every conclusion. Help me understand the implementation well enough to defend it in a viva. Do not expose patient identifiers.
+
+Start by explaining:
+1. What A2 requires and how each requirement maps to our repository artifacts.
+2. Why handwriting, mixed Bangla/English text, repeated prescription templates, shadows and page layout make this corpus difficult.
+3. The complete pipeline and the contract between Page, Region and Chunk.
+4. Why PaddleOCR-VL 1.6 is a reproduced/adapted pretrained method but is not fine-tuning.
+5. How CER, WER and medication-entity F1 differ, using our 12-page/61-medication evaluation.
+6. Why the crop+trim OCR result can improve CER/F1 while remaining unsafe for clinical use.
+7. Why 64-word chunks with 16-word overlap were selected over 128/24 and 256/32.
+8. Why multilingual E5-small, lexical feature hashing and reciprocal-rank fusion complement one another.
+9. How to verify the real “Phoscon 210mg” retrieval example and the failed whole-page OCR example.
+10. Why privacy is our primary NFR, while index build time is only an operational metric.
+11. Interpret the manual privacy pilot: 12 pages, 12 patient-name entities, one explicit redaction, two indexed leaks and nine OCR omissions. Explain why explicit recall is 0.0833, conditional recall is 0.3333 and non-disclosure is 0.8333.
+12. Explain why a regex scan reporting zero unresolved matches did not prove privacy recall.
+13. Identify contradictions or weak claims in our form, notebook, reports and configs.
+14. Decide whether fine-tuning is strictly required by the course guide, what A1 promised, and what honest experiment would be needed.
+15. End with at least ten viva questions. Ask me to answer them one by one, correct weak answers, and make me explain the design in my own words.
+
+STEP 3 — CONTINUE THE REAL CONVERSATION
+
+Do not paste all questions at once and stop. Ask follow-ups in your own words. Useful follow-ups include:
+- Show me the exact evidence supporting that number.
+- Is OCR omission a successful redaction? Why or why not?
+- What would make the retrieval evaluation misleading?
+- Why was classical enhancement rejected?
+- Why not use HNSW or IVF for only 943 chunks?
+- What claim would be unsafe in a medication-search system?
+- What would you change if you had verified line-level training labels?
+- Which result surprised you most, and why?
+
+STEP 4 — EXPORT WITHOUT REWRITING
+
+Save the complete chronological conversation as:
+
+transcripts/2105113.txt
+
+It must contain, in order:
+1. Header: name, student ID, project, sections led, AI system and date.
+2. Full conversation: every real prompt and every real AI reply, unedited. Remove passwords/API keys if any appear.
+3. Personal reflection written by Prity:
+   - what I initially misunderstood;
+   - where I challenged or corrected the AI;
+   - what measured evidence changed my decision;
+   - what I personally verified;
+   - what limitation remains;
+   - how the conversation affected Sections 1, 5, 6, 7 and 8.
+
+Do not submit this instruction file itself as the transcript. Submit the exported real conversation. you are the ai model , now complete the transcript
+
+ASSISTANT:
+I’ll inspect the project files first, verify the measured results and contradictions against the repository, then I’ll build the transcript from the **actual conversation and evidence** rather than inventing viva dialogue. I’ll also preserve the required data-permission statement and avoid exposing identifiers.
+
+ASSISTANT:
+The repository already confirms several key numbers: the 12-page OCR set has 61 medication entries; 64/16 chunking gives E5 recall@5 = 1.00; and the privacy pilot **fails** the ≥0.98 target. I’m now checking the form/notebook/code for places where the written claims overstate what those measurements actually prove.
+
+ASSISTANT:
+I found two important weaknesses you should be ready to defend. First, the project specification/codebase guide explicitly says to **fine-tune a pretrained OCR model**, while your A2 form’s grading language only requires reproducing/adapting a published/pretrained method—so the repository should not claim that the requirement is unambiguously satisfied. Second, `task.yaml` requires at least **60,000 source words**, but the measured snapshot has only **42,642 non-overlapped OCR words**.
+
+ASSISTANT:
+I inspected the supplied repository evidence. I will separate what is measured from what is only an interpretation.
+
+1. A2 requirements and repository mapping
+
+The filled A2 form defines A2 as the knowledge-base milestone: ingest scans, optionally enhance them, detect layout, run OCR, chunk text, embed it, build the vector index, and show evidence that OCR and retrieval actually work.
+
+The main mappings are:
+- Section 1 / A1 carry-forward: `configs/task.yaml`, `data/provenance.md`, `notebooks/eda.ipynb`, `grading_kit/manifest.yaml`, held-out pages and labels.
+- Model/design choices: `forms/A2_form.docx` and `configs/design_choices.md`.
+- OCR evidence: `reports/eval_report.md` plus `reports/evidence/ocr_*.json`.
+- Retrieval/index evidence: `artifacts/index_e5/index_stats.json`, the hash index stats, `reports/evidence/chunk_ablation.json`, `reports/evidence/retrieval_eval.json`, and `reports/evidence/retrieval_example.json`.
+- Pipeline description: `reports/pipeline_diagram.md`.
+- Demonstration: `notebooks/kb_demo.ipynb`.
+- Privacy evidence: `reports/privacy_audit.md`, `artifacts/pii_holdout_metrics.json`, `grading_kit/pii_holdout_labels.jsonl`, and `scripts/eval_pii_holdout.py`.
+- Your required AI evidence: `transcripts/2105113.txt`.
+
+One compliance issue is already visible: `task.yaml` says the corpus minimum is 300 pages and 60,000 words. The measured snapshot has 310 pages but only 42,642 non-overlapped OCR word occurrences, so the page minimum is met but the measured word floor is not.
+
+2. Why this corpus is hard
+
+Handwriting is difficult because character shapes vary by writer, pen pressure, spacing, abbreviation and stroke connection. Medication names are particularly unforgiving: changing even one or two characters can turn one drug string into another.
+
+Bangla/English code-switching makes recognition and retrieval harder because one prescription can contain Bengali script, Latin drug names, English abbreviations, digits and Bengali numerals. A recognizer or tokenizer that is strong on one script can still fail at transitions between scripts.
+
+Repeated printed templates help layout because headers occur in predictable areas, but they also compete with handwriting for OCR attention or token budget. The evidence shows at least one page where whole-page OCR produced only the header while a crop recovered medication lines.
+
+Shadows, perspective, JPEG artifacts and uneven illumination alter stroke contrast. However, your experiment does not justify the broad statement that “enhancement is bad.” It only shows that the particular classical enhancement recipe tested reduced medication-entity F1 from 0.490 to 0.413 on the 12-page sample.
+
+3. Pipeline and Page → Region → Chunk contract
+
+The fixed contracts are very small:
+- `Page`: `id`, `image_path`, `doc_id`.
+- `Region`: `page_id`, bounding box, and `kind` such as heading/text/table/figure.
+- `Chunk`: `id`, `doc_id`, `text`, one or more `page_ids`, plus retrieval `score`.
+
+The intended conceptual flow is Page → layout Regions → OCR text → redaction/normalization → text Chunks → embeddings → index.
+
+But there is an implementation nuance you should not hide in a viva: the current cached OCR adapter effectively emits one page-level text chunk per page and does not attach the OCR line polygons to the `Region` objects. `layout.detect()` makes only a heading region and a body region using a fixed height ratio. So “typed Page→Region→Chunk contracts” is true at the interface level, but the final cached OCR path does not fully exploit fine-grained region-to-text associations.
+
+4. Why PaddleOCR-VL 1.6 is adapted pretrained OCR, not fine-tuning
+
+You load an existing pretrained PaddleOCR-VL model and change inference conditions around it: BF16/SDPA, batching, token cap, retry policy, crop strategy and tail trimming. Those are adaptation/inference/preprocessing choices.
+
+Fine-tuning would require updating model weights using labelled prescription examples and an optimizer. The repository contains no evidence of such weight updates. Therefore “pretrained, adapted; not fine-tuned” is the honest description.
+
+5. CER, WER and medication-entity F1
+
+Your evaluation covers 12 pages and 61 reference medication-name/strength entries.
+
+CER measures character-level edit error. Lower is better. Baseline CER is 0.499; crop+trim is 0.413. CER is sensitive to spelling-level corruption.
+
+WER measures word-level edit error. Lower is better. Baseline and crop+trim are both about 0.702. One wrong character can make an entire word count as wrong, so WER can remain high even if some character-level errors improve.
+
+Medication-entity F1 asks a different question: did the system recover the medication-name/strength entities? It balances precision and recall. Baseline F1 is 0.490; crop+trim is 0.505. In the crop+trim run, precision is about 0.587 and recall about 0.443, corresponding to 27 true positives, 19 false positives and 34 false negatives.
+
+The metrics therefore measure different failure modes. A text can have a somewhat better CER but still miss clinically important medicine entities.
+
+6. Why crop+trim improves metrics but is still unsafe clinically
+
+Crop+trim reduces irrelevant header content and gives the OCR model more effective capacity for the Rx body. On the measured set, CER improves from 0.499 to 0.413 and entity F1 from 0.490 to 0.505.
+
+But F1 ≈ 0.505 and recall ≈ 0.443 are far too weak for autonomous medication decisions. The failed-page example still contains errors such as corrupted strengths and names after crop recovery. Therefore the safe claim is: crop+trim is a better recovery aid for search/review, not a clinically trustworthy transcription system.
+
+Also, saying the crop experiment “proves layout/token-budget competition was the cause” is too strong. The result is consistent with that explanation, but cropping changes several things at once, including image area and effective sequence burden. It supports the hypothesis; it does not isolate causality.
+
+7. Why 64/16 was selected
+
+The chunk ablation used five retrieval queries at k=5:
+- 64 words / 16 overlap: E5 recall@5 = 1.00.
+- 128 / 24: E5 recall@5 = 0.80.
+- 256 / 32: E5 recall@5 = 0.20.
+
+Hybrid recall@5 remained 1.00 for all three settings, and mean hybrid latency stayed around 2.7 ms. Therefore 64/16 is the best measured choice for dense E5 retrieval on this tiny evaluation set.
+
+Why it can help: smaller chunks dilute a medication mention with less unrelated prescription text while 16-word overlap reduces the chance of splitting a medication from nearby strength/schedule context.
+
+But five queries are too few to claim 64/16 is universally optimal. You can say it was selected by the available ablation.
+
+8. Why E5, feature hashing and RRF complement one another
+
+`intfloat/multilingual-e5-small` gives a 384-dimensional semantic representation and is useful for multilingual or paraphrased queries.
+
+Signed lexical feature hashing gives a 2048-dimensional sparse-style lexical signal. It is useful when exact strings such as drug names and strengths matter.
+
+Reciprocal-rank fusion combines ranks rather than raw similarity scores, so you do not need to calibrate E5 cosine scores against lexical cosine scores.
+
+Conceptually this is a sensible complement: semantic matching + exact lexical matching + rank-level fusion.
+
+However, your current five-query evaluation does not empirically prove hybrid is superior, because E5, hashing and hybrid all achieve recall@5 = 1.00. The complementarity is a design rationale; superiority would need a larger, harder query set containing paraphrases, OCR corruptions and exact-name confounders.
+
+9. Verifying the Phoscon example and failed OCR example
+
+For `Phoscon 210mg`, `reports/evidence/retrieval_example.json` records:
+- hybrid RRF,
+- rank 1,
+- chunk `page:a66ce32fc45cfd08:3`,
+- document `Screenshot_20260815-062822_Somatec__1RR0EEAz.jpg`,
+- evidence `Tab. Phoscon (210mg)`,
+- judgement `correct`.
+
+The notebook prints the same stored evidence. To verify it rather than merely trust the JSON, trace the chunk ID into `artifacts/index_e5/chunks.jsonl` and then visually verify the restricted source page. Do not copy the patient identity into the transcript.
+
+For the failed page `Screenshot_20260815-063516_Somatec.jpg`, the report says full-page OCR recovered 0/5 medications while the crop run produced approximate versions of all five reference lines. The crop evidence JSON shows those predictions and their remaining spelling/strength errors. The visual page should be checked privately to confirm the five medication lines are actually present.
+
+10. Privacy NFR vs index build time
+
+`task.yaml` declares privacy as the primary NFR with target PII entity recall ≥0.98. That means privacy is a requirement the system must satisfy.
+
+Index build time is measured—7.304 s for E5 and 1.373 s for hashing after OCR—but no target says the system passes or fails based on those values. They are operational measurements, not the declared NFR.
+
+A fast index that leaks names fails the project’s declared privacy objective.
+
+11. Privacy pilot arithmetic
+
+There are 12 visually present patient-name entities across 12 pages.
+
+One was explicitly detected and redacted. So explicit detection/redaction recall is 1/12 = 0.0833.
+
+OCR extracted only three of the 12 names into text: one was redacted and two leaked. Conditional on OCR extraction, the redactor caught 1 of 3, so conditional recall is 1/3 = 0.3333.
+
+For end-to-end non-disclosure, one explicit redaction plus nine OCR omissions means 10 of the 12 names did not appear in the index. Therefore non-disclosure = 10/12 = 0.8333; leak rate = 2/12 = 0.1667.
+
+Critical distinction: the nine OCR omissions reduce disclosure, but they are not successful redaction. A privacy detector cannot claim credit for identifiers it never saw.
+
+12. Why zero regex matches did not prove privacy recall
+
+The regex audit only asks whether known detector patterns remain after redaction. The patient-name rule is essentially an English line beginning with `Name:`; phone and email rules are also pattern-limited.
+
+If OCR corrupts a name label, crops it, emits Bangla instead of the expected English label, or omits the name entirely, the regex can see nothing and still report zero unresolved matches. That is why the zero-match index scan is a leakage regression test, not a recall experiment.
+
+Privacy recall requires independent ground-truth labels created from the images and then checking whether every labelled PII entity is removed from the indexed output.
+
+13. Contradictions and weak claims
+
+The most important ones I found are:
+
+- Corpus floor: `task.yaml` requires at least 60,000 words, while the measured snapshot has 42,642 non-overlapped OCR words. The form should not imply corpus-size compliance without resolving this.
+- Fine-tuning: the project specification and Codebase Guide explicitly say to fine-tune a pretrained OCR model, while your implementation does not. The A2 form itself only explicitly grades reproduction/adaptation of a published/pretrained method. This is a real course-document tension, not something to paper over.
+- A1 promise: `reports/a2_readiness.md` states A1 proposed TrOCR fine-tuning, but the original A1 submission is not included in the supplied repository, so I cannot independently verify that promise from primary A1 evidence here.
+- “Proving” cause of OCR failure: crop recovery supports the layout/token-competition explanation but does not prove it causally.
+- “Each setting was measured”: some settings were measured as grouped recipes, not individually isolated. For example, crop+trim combines layout crop and trimming.
+- Hybrid superiority: current retrieval evidence shows all three systems at recall@5 = 1.00 on only five queries, so the evidence does not prove hybrid outperforms E5 or hashing.
+- Privacy scope: the manual holdout covers only patient names, while the declared PII target is broader. A final NFR claim needs other entity types such as phones, emails, IDs, addresses and signatures, depending on the agreed scope.
+- Page→Region→Chunk wording: the contract exists, but cached OCR currently collapses to page-level chunks and does not preserve fine-grained OCR polygon-to-region text relationships.
+- Script counts: Bengali=288, Latin=902 and mixed=276 are not mutually exclusive categories if mixed chunks are counted in both script sets. Presenting them as if they partition 943 chunks would be misleading.
+- Clinical-safety wording: “recovered five approximate lines” is acceptable; “safe transcription” or “correct medication extraction” would not be.
+
+14. Is fine-tuning strictly required, and what would an honest experiment look like?
+
+The course specification says students “still build layout analysis, fine-tuning, and error analysis,” and Stage 3 says “Fine-tune a pretrained recognizer on the corpus.” The Codebase Guide’s A2 checklist likewise says `vision/ocr.py` should “fine-tune a pretrained OCR model.” So the broad course guide does explicitly require fine-tuning.
+
+The filled A2 form, however, phrases the graded Section 3 requirement as “at least one existing published/pretrained method you reproduce and adapt” and explicitly records your OCR as “Pretrained, adapted; not fine-tuned.” This creates an inconsistency between course-level guidance and milestone-form wording.
+
+Therefore the defensible position is not “fine-tuning is definitely unnecessary.” It is: “Our A2 evidence satisfies the form’s reproduced/adapted-pretrained-method requirement, but the broader course guide explicitly calls for OCR fine-tuning, so we either need instructor confirmation or a genuine fine-tuning experiment.”
+
+An honest experiment would need verified training labels, preferably line-level image crops paired with exact transcriptions. Split by document/page so the same page is never in train and held-out evaluation. Fine-tune a suitable OCR model on the training set, freeze the test set, and compare the pretrained baseline against the fine-tuned model on exactly the same held-out pages using CER, WER and medication-entity precision/recall/F1. Record optimizer, learning rate, epochs, checkpoint selection and seed. Do not call prompt changes, crops, token-limit changes or post-processing “fine-tuning.”
+
+If you only have the current 12-page/61-medication evaluation labels, do not train on those same held-out examples. You need additional labelled training data or a properly redesigned split.
+
+One more point for your viva: your data statement is appropriately cautious. The data was obtained with permission from Somatec Pharmaceuticals Ltd. through the authorized project channel; raw clinical pages remain restricted and should not be redistributed without authorization.
+
+We should now do the viva interactively rather than fabricate your answers. I will ask the question bank one at a time, correct your answer, and then move to the next. Across the conversation I will cover at least ten questions.
+
+Viva question 1: In your own words, what is the difference between **OCR omission**, **explicit PII redaction**, and **end-to-end non-disclosure**? Use the numbers 9, 1 and 10/12 from your pilot, and explain why the nine omissions must not be counted as successful redaction.
+
+I created the transcript file at `transcripts/2105113.txt`. Because the assignment requires a genuine conversation and a reflection written by Prity, I have not invented your future viva answers or impersonated your personal reflection. Continue answering the viva questions here; the transcript should then be updated with those real turns before submission.
+
+Download: [2105113.txt](sandbox:/mnt/data/2105113.txt)
+
+## PERSONAL REFLECTION
+
+PERSONAL REFLECTION — MUST BE WRITTEN BY PRITY
+
+This section cannot truthfully be completed by the AI on Prity's behalf because the A2 form explicitly requires a personal reflection and the requested transcript must be a genuine, unedited conversation. After the viva conversation is finished, Prity should write this section in her own words covering:
+- what I initially misunderstood;
+- where I challenged or corrected the AI;
+- what measured evidence changed my decision;
+- what I personally verified;
+- what limitation remains;
+- how the conversation affected Sections 1, 5, 6, 7 and 8.
