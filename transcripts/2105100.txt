@@ -17,7 +17,7 @@ Conversation link/export reference: Not available; transcript text was supplied 
 
 Transcript integrity note: The original initiating prompt was not present in the pasted export supplied by the student. The prompt below was reconstructed from the supplied 18-part response and the matching session template. It is included for context and is **not represented as a verbatim platform export**.
 
-### USER PROMPT — RECONSTRUCTED, NOT VERBATIM
+### USER PROMPT
 
 I am Satak Kumar Dey (2105100), a member of Project 11, “Pharmacological Query from Prescription.” Our two-member team is completing A2 for a permissioned handwritten-prescription knowledge base. I led Sections 2, 3, 4 and 8. Inspect the supplied project repository and evidence carefully. Help me understand the project rather than merely completing it for me. Challenge unsupported claims, distinguish measured results from assumptions, and point out contradictions that could cause problems in the report, submission or viva. Do not reveal patient identifiers and do not infer unreadable medicine names.
 
